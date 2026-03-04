@@ -1,0 +1,26 @@
+site_name: envision-classifier
+site_description: Few-shot classifier for detecting eye imaging datasets
+site_author: FAIR Data Innovations Hub
+
+repo_url: https://github.com/EyeACT/envision-classifier
+edit_uri: https://github.com/EyeACT/envision-classifier/edit/main/docs
+
+dev_addr: 127.0.0.1:3000
+
+theme: readthedocs
+
+markdown_extensions:
+  - codehilite
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Modules:
+      - Classifier: modules/classifier.md
+      - CLI: modules/cli.md
+  - About:
+      - Release Notes: about/changelog.md
+      - Contributor Guide: about/contributing.md
+      - License: about/license.md

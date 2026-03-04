@@ -1,0 +1,140 @@
+[tool.poetry]
+
+name = "envision-classifier"
+version = "0.1.0-beta.1"
+description = "Few-shot classifier for detecting eye imaging datasets"
+
+packages = [{ include = "envision_classifier" }]
+
+license = "MIT"
+authors = [
+    "FAIR Data Innovations Hub <contact@fairdataihub.org>",
+    "James O'Neill <joneill@calmi2.org>",
+]
+
+readme = "README.md"
+homepage = "https://github.com/EyeACT/envision-classifier"
+documentation = "https://envision-classifier.readthedocs.io"
+repository = "https://github.com/EyeACT/envision-classifier"
+
+keywords = [
+    "eye imaging",
+    "ophthalmology",
+    "OCT",
+    "fundus",
+    "retina",
+    "machine learning",
+    "dataset discovery",
+    "classification",
+    "setfit",
+    "few-shot",
+    "fair-data",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[tool.poetry.dependencies]
+
+python = "^3.10"
+
+click = "^8.0"
+
+# ML/AI dependencies
+torch = ">=2.0.0"
+transformers = ">=4.35.0"
+setfit = ">=1.0.0"
+datasets = ">=2.14.0"
+scikit-learn = ">=1.3.0"
+huggingface-hub = ">=0.20.0"
+
+[tool.poetry.group.dev.dependencies]
+
+# Formatters
+black = "^22.1"
+tomli = "*"
+isort = "^5.10"
+
+# Linters
+mypy = "^1.0"
+pydocstyle = "^6.1"
+pylint = "~2.15"
+wrapt = "*"
+
+# Testing
+pytest = "^7.1"
+pytest-describe = "^2.0"
+pytest-cov = "^3.0"
+
+# Documentation
+mkdocs = "~1.3"
+pygments = "^2.11.1"
+
+# Tooling
+poethepoet = "^0.20.0"
+
+[tool.poetry.scripts]
+
+envision-classifier = "envision_classifier.cli:cli"
+
+[tool.poe.tasks]
+
+docs = "mkdocs serve"
+format_with_isort = "isort envision_classifier tests"
+format_with_black = "black envision_classifier tests"
+format = ["format_with_isort", "format_with_black"]
+typecheck = "mypy envision_classifier tests"
+pylint = "pylint envision_classifier tests --rcfile=.pylint.ini"
+precommit = ["format", "typecheck", "pylint"]
+test = "pytest -rx -W ignore::DeprecationWarning"
+
+[tool.black]
+
+quiet = true
+line-length = 100
+
+[tool.isort]
+
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+
+ignore_missing_imports = true
+no_implicit_optional = true
+check_untyped_defs = true
+cache_dir = ".cache/mypy/"
+
+[tool.pytest.ini_options]
+
+addopts = """
+--strict-markers
+
+-r sxX
+--show-capture=log
+
+--cov-report=html
+--cov-report=term-missing:skip-covered
+--no-cov-on-fail
+"""
+
+cache_dir = ".cache/pytest/"
+
+markers = []
+
+[build-system]
+
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
