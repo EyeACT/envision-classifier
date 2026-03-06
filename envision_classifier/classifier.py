@@ -2,7 +2,7 @@
 ENVISION: Eye Imaging Dataset Classification
 
 SetFit Few-Shot Classifier for Eye Imaging Dataset Detection
-Uses Alibaba-NLP/gte-large-en-v1.5 sentence transformer with 4-class classification:
+Uses sentence-transformers/all-mpnet-base-v2 sentence transformer with 4-class classification:
   - 3: EYE_IMAGING - Actual eye imaging datasets (fundus, OCT, OCTA, cornea, etc.)
   - 2: EYE_SOFTWARE - Code, tools, models for eye imaging (no actual data)
   - 1: EDGE_CASE - Eye research (papers, reviews, non-imaging data)
@@ -20,7 +20,7 @@ import torch
 warnings.filterwarnings("ignore")
 
 # Model configuration
-BASE_MODEL_NAME = "Alibaba-NLP/gte-large-en-v1.5"
+BASE_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
 LABELS = ["NEGATIVE", "EDGE_CASE", "EYE_SOFTWARE", "EYE_IMAGING"]
 
@@ -29,6 +29,7 @@ LABELS = ["NEGATIVE", "EDGE_CASE", "EYE_SOFTWARE", "EYE_IMAGING"]
 # ============================================================
 
 # EYE_IMAGING (label=3): Actual eye imaging datasets with real image data
+# Cleaned: removed 21 misplaced examples (reviews, software, stats, metabolomics)
 EYE_IMAGING_EXAMPLES = [
     "Dataset from fundus images for the study of diabetic retinopathy progression",
     "Optical Coherence Tomography Angiography-OCTA Dataset for Diabetic Retinopathy",
@@ -62,48 +63,29 @@ EYE_IMAGING_EXAMPLES = [
     "Slit lamp photography dataset for cataract grading",
     "Multi-Disease Detection in Retinal Imaging dataset",
     "Retinal Wave Dataset - calcium imaging of developing retina",
-    "Circuit mechanisms underlying embryonic retinal waves dataset",
     "Evaluation benchmark for natural robustness of retinal vessel segmentation",
-    "GWAS Summary Statistics For Eye Imaging Traits",
-    "Fundus vessel phenotypes quantitative trait dataset",
     "Probabilistic volumetric speckle suppression in OCT using deep learning",
     "Optical coherence tomography radiation cataract image dataset",
     "HRF-Seg+: A Multi-Structure Annotated Fundus Image Dataset",
     "Multimodal OCTA and Fundus Image dataset for diabetic retinopathy detection",
     "Iraqi Retinal Fundus Diabetic Retinopathy Dataset IRFDRD",
     "OCT Fundus Registration dataset for multimodal retinal analysis",
-    "EyeLab: Python package for OCT and fundus image processing",
-    "Fiji-mCNVImageAnalysisTool for choroidal neovascularization in OCTA",
-    "Automatic Choroid Vascularity Index Calculation in OCT Images",
     "Topological characterization of the retinal microvascular network",
-    "ResNet-50 classifiers and diffusion models trained on retinal fundus images",
     "JRC-Multi-Modal Retinal Vessel Segmentation dataset",
     "A Fundus Image Dataset for Domain Generalization in Joint Optic Disc and Cup Segmentation",
-    "Flexible corneal neurotechnology reveals in-vivo pathological cornea imaging",
     "CeraMIRScan: Mid-infrared OCT Scan Dataset for ophthalmic applications",
     "qtOCT: quantitative transmission optical coherence tomography dataset",
-    "Retinal S-cone specific anatomical and physiological data",
-    "Nonlinear spatial integration allows the retina to detect the direction of motion",
-    "Thrombospondin-1 Mediates Axon Regeneration in Retinal Ganglion Cells",
-    "Metabolomics of mouse retina and optic nerve",
-    "Optic nerve injury impairs intrinsic mechanisms underlying early eye imaging",
-    "Metabolomics of ocular hypertensive rat optic nerve",
     "Mammalian animal and human retinal organ culture imaging data",
-    "Data from Analysis of potential ischemic effect of intravitreal anti-VEGF OCT",
-    "Photodynamic Ocular Drug Delivery System with OCT monitoring",
     "Spontaneous retinal reperfusion of capillary nonperfusion OCT and fundus",
     "Analysis on Multimodal Imaging of stealth Choroidal Neovascularization OCTA",
     "Longitudinal changes in retinal microstructures OCT imaging data",
     "Macular Drusen histology and OCT correlation dataset",
-    "Data to Choroidal changes in intermediate age-related macular degeneration",
     "Generalized Analysis of Vessels in Eye GAVE Challenge dataset",
     "Automated fundus image quality assessment and segmentation dataset",
     "Diabetic Retinopathy Detection using Retinal Images dataset",
     "Optic disc localization using graph traversal algorithm dataset",
     "An Image Processing Algorithm to Detect Exudates in Fundus Images",
     "Binary operation based hard exudate detection fundus dataset",
-    "A Review on Automatic Detection and Recognition of Hard Exudates",
-    "A deep learning approach based on stochastic gradient descent for DR detection",
     "EXUDATES DETECTION FROM DIGITAL FUNDUS IMAGE dataset",
     "COMPARATIVE STUDY OF DIABETIC RETINOPATHY K-NN dataset",
     "AN AUTOMATIC SCREENING METHOD TO DETECT OPTIC DISC dataset",
@@ -121,9 +103,6 @@ EYE_IMAGING_EXAMPLES = [
     "EARLY DETECTION OF HIGH BLOOD PRESSURE AND DIABETIC RETINOPATHY fundus images",
     "Diagnosis Of Diabetic Retinopathy: fundus image analysis dataset",
     "FUNDUS IMAGES FOR DIAGNOSIS OF DIABETIC RETINOPATHY dataset",
-    "A Comprehensive Survey of Deep Learning for Diabetic Retinopathy dataset",
-    "anithaj17/RetinoNet-DR-Classification fundus image dataset",
-    "AMikroulis/octopus OCT image processing dataset",
     "Retinal status analysis method based on feature extraction OCT dataset",
     "Data from Inactivation of adenosine receptor retinal imaging",
     "Polarisation camera dSTORM datasets of retinal cells",
@@ -132,6 +111,7 @@ EYE_IMAGING_EXAMPLES = [
 ]
 
 # EYE_SOFTWARE (label=2): Code, tools, models for eye imaging (NOT actual data)
+# Added: misplaced software from EYE_IMAGING + EDGE_CASE, spot-check examples
 EYE_SOFTWARE_EXAMPLES = [
     "linchundan88/Fundus-image-preprocessing: fundus image preprocessing Python code",
     "NIH-NEI/oct-image-segmentation-models: v0.8.2 trained model weights",
@@ -163,9 +143,31 @@ EYE_SOFTWARE_EXAMPLES = [
     "duke-lungmap-team/odifmap: image processing code publication",
     "young-oct/OCT-denoising: denoising algorithm code repository",
     "costapt/vess2ret: vessel to retina synthesis code",
+    # Moved from EYE_IMAGING (software/tools, not datasets)
+    "EyeLab: Python package for OCT and fundus image processing",
+    "Fiji-mCNVImageAnalysisTool for choroidal neovascularization in OCTA",
+    "Automatic Choroid Vascularity Index Calculation in OCT Images",
+    "ResNet-50 classifiers and diffusion models trained on retinal fundus images",
+    "AMikroulis/octopus OCT image processing dataset",
+    "anithaj17/RetinoNet-DR-Classification fundus image dataset",
+    # Moved from EDGE_CASE (clearly software/tools)
+    "Python package for retinal image preprocessing",
+    "Deep learning framework for fundus image segmentation code only",
+    "OCT image reconstruction algorithm implementation",
+    "Retinal vessel extraction software repository",
+    "Optic disc detection neural network model weights",
+    "Diabetic retinopathy grading API documentation",
+    "Fundus image augmentation library code",
+    "DICOM viewer for ophthalmic images software",
+    "OCT visualization toolkit implementation",
+    "Retinal layer segmentation algorithm code repository",
+    # Spot-check derived (model weights / recording device code)
+    "ANNs pre-trained on Retinal Waves model weights",
+    "Flexible corneal neurotechnology reveals in-vivo pathological retinal oscillations recording device",
 ]
 
 # EDGE_CASE (label=1): Eye/vision research but NOT actual imaging datasets
+# Cleaned: removed misplaced software→EYE_SOFTWARE, non-eye→NEGATIVE; added eye metabolomics
 EDGE_CASE_EXAMPLES = [
     "A Review of Deep Learning Methods for Diabetic Retinopathy Detection",
     "Survey of Machine Learning Techniques for Glaucoma Diagnosis",
@@ -197,26 +199,7 @@ EDGE_CASE_EXAMPLES = [
     "Telemedicine in ophthalmology implementation analysis",
     "Eye care access in rural communities demographic data",
     "Waiting times for cataract surgery administrative data",
-    "Python package for retinal image preprocessing",
-    "Deep learning framework for fundus image segmentation code only",
-    "OCT image reconstruction algorithm implementation",
-    "Retinal vessel extraction software repository",
-    "Optic disc detection neural network model weights",
-    "Diabetic retinopathy grading API documentation",
-    "Fundus image augmentation library code",
-    "DICOM viewer for ophthalmic images software",
-    "OCT visualization toolkit implementation",
-    "Retinal layer segmentation algorithm code repository",
-    "Brain MRI analysis for Alzheimer's disease detection",
-    "Cardiac CT angiography for coronary artery disease",
-    "Dermatology skin lesion classification dataset",
-    "Dental X-ray caries detection images",
-    "Chest X-ray pneumonia detection dataset",
-    "Mammography breast cancer screening images",
-    "Histopathology slide analysis for cancer diagnosis",
-    "Ultrasound imaging for liver disease assessment",
-    "PET scan analysis for neurological disorders",
-    "Spine MRI for degenerative disc disease",
+    # Eye tracking / gaze (eye-related but not imaging datasets)
     "Eye tracking data for attention research",
     "Gaze estimation dataset for human-computer interaction",
     "Pupil dilation response to emotional stimuli",
@@ -227,16 +210,7 @@ EDGE_CASE_EXAMPLES = [
     "Iris recognition biometric dataset",
     "Facial expression analysis including eye region",
     "Driver attention monitoring eye tracking",
-    "OCT for industrial material inspection dataset",
-    "Optical coherence tomography in dermatology skin imaging",
-    "OCT imaging of atherosclerotic plaque in arteries",
-    "Dental OCT for tooth structure analysis",
-    "OCT for art conservation painting analysis",
-    "Industrial OCT for semiconductor inspection",
-    "OCT in cardiology intravascular imaging",
-    "Non-destructive testing using OCT",
-    "OCT for pharmaceutical tablet coating analysis",
-    "Ceramic quality inspection using OCT",
+    # Animal eye development (eye-related but not human imaging)
     "Drosophila compound eye development gene expression",
     "Zebrafish eye regeneration molecular analysis",
     "Mouse retinal development transcriptomics",
@@ -247,6 +221,7 @@ EDGE_CASE_EXAMPLES = [
     "Cephalopod camera eye evolution genomics",
     "Spider eye arrangement morphological analysis",
     "Mantis shrimp visual system spectral analysis",
+    # Other eye measurements (not imaging)
     "Digital fundus thermometry for fever screening",
     "Ocular surface temperature measurement",
     "Tear film stability analysis without imaging",
@@ -257,9 +232,32 @@ EDGE_CASE_EXAMPLES = [
     "Optical properties of crystalline lens in vitro",
     "Corneal biomechanics simulation data",
     "Aqueous humor proteomics analysis",
+    # Moved from EYE_IMAGING (eye-related but not imaging datasets)
+    "GWAS Summary Statistics For Eye Imaging Traits",
+    "Fundus vessel phenotypes quantitative trait dataset",
+    "Retinal S-cone specific anatomical and physiological data",
+    "Nonlinear spatial integration allows the retina to detect the direction of motion",
+    "Thrombospondin-1 Mediates Axon Regeneration in Retinal Ganglion Cells",
+    "Optic nerve injury impairs intrinsic mechanisms underlying early eye imaging",
+    "Circuit mechanisms underlying embryonic retinal waves dataset",
+    "Data from Analysis of potential ischemic effect of intravitreal anti-VEGF OCT",
+    "Photodynamic Ocular Drug Delivery System with OCT monitoring",
+    "Data to Choroidal changes in intermediate age-related macular degeneration",
+    # Spot-check derived (eye-related but not imaging)
+    "Perspectives and Limitations of Mesenchymal Stem Cell-Based Therapy for Corneal injuries",
+    "Mesoporous Silica Nanocarriers of siRNA for Retinal Delivery drug mechanism",
+    # Eye metabolomics (eye tissue but metabolomics, not imaging)
+    "Metabolomics of mouse retina and optic nerve",
+    "Metabolomics of ocular hypertensive rat optic nerve",
+    "NMR spectroscopy-based metabolomics of organotypic retinal explants",
+    "Vitreous humor metabolomics profiling in diabetic retinopathy and retinal detachment",
+    "Spatial metabolomics of primate retina macula and periphery regions",
+    "Aqueous humor metabolome analysis in glaucoma patients",
+    "Lipidomics of retinal pigment epithelium in age-related macular degeneration",
 ]
 
 # NEGATIVE (label=0): Clearly not eye-related
+# Added: non-eye medical imaging from EDGE_CASE, spot-check confounders
 NEGATIVE_EXAMPLES = [
     "Climate change impact on coral reef ecosystems dataset",
     "COVID-19 genome sequencing and variant analysis",
@@ -494,6 +492,50 @@ NEGATIVE_EXAMPLES = [
     "Dataset_1 of AF driver detection in pulmonary vein area cardiac arrhythmia",
     "Data from Dichoptic metacontrast masking functions to infer transmission delay",
     "IRIS Carbon Mapping Project Curated Dataset carbon emissions",
+    # Moved from EDGE_CASE (non-eye medical imaging — clearly NEGATIVE)
+    "Brain MRI analysis for Alzheimer's disease detection",
+    "Cardiac CT angiography for coronary artery disease",
+    "Dermatology skin lesion classification dataset",
+    "Dental X-ray caries detection images",
+    "Chest X-ray pneumonia detection dataset",
+    "Mammography breast cancer screening images",
+    "Histopathology slide analysis for cancer diagnosis",
+    "Ultrasound imaging for liver disease assessment",
+    "PET scan analysis for neurological disorders",
+    "Spine MRI for degenerative disc disease",
+    # Moved from EDGE_CASE (non-eye OCT — clearly NEGATIVE)
+    "OCT for industrial material inspection dataset",
+    "Optical coherence tomography in dermatology skin imaging",
+    "OCT imaging of atherosclerotic plaque in arteries",
+    "Dental OCT for tooth structure analysis",
+    "OCT for art conservation painting analysis",
+    "Industrial OCT for semiconductor inspection",
+    "OCT in cardiology intravascular imaging",
+    "Non-destructive testing using OCT",
+    "OCT for pharmaceutical tablet coating analysis",
+    "Ceramic quality inspection using OCT",
+    # Spot-check confounders: brain/neuro segmentation (use "segmentation" vocabulary)
+    "ASHS-OAP atlas for automatic entorhinal cortex segmentation brain Alzheimer",
+    "FastSurferVINN Checkpoints brain segmentation model weights",
+    "Phospho-seq integrated multi-modal profiling intracellular protein dynamics brain organoid",
+    # Spot-check confounders: non-eye segmentation (use "segmentation" vocabulary)
+    "Doodleverse building and flood segmentation satellite imagery",
+    "Doodleverse water segmentation remote sensing",
+    "Beach sediment detection and segmentation coastal imagery",
+    "DTL-IceNet ice segmentation polar remote sensing",
+    "Vine Trunk Semantic Segmentation using Individual Vine Trunks agriculture",
+    # Spot-check confounders: plant OCT (use "OCT" vocabulary but not eye)
+    "Quantification of plant morphology and leaf thickness with OCT",
+    "Revealing real-time 3D in vivo pathogen dynamics in plants by label-free optical",
+    # Spot-check confounders: other misclassified records
+    "Knowledge-Guided ML can improve carbon cycle predictions in agriculture",
+    "PomerFish dataset for fishes across Pomerania freshwater waterbodies underwater",
+    "Integrating time-series analysis and deep learning to reconstruct RTS dynamics remote sensing",
+    # Spot-check: 4 additional missing NEGATIVE confounders
+    "Voronoi segmentation tutorial generic image processing",
+    "Audio-visual segmentation multimodal learning benchmark",
+    "Exploring high PT experimental charges through the lens of phase maps geology",
+    "SF Bay Area Coda Calibration Example Dataset seismology",
 ]
 
 
@@ -533,6 +575,7 @@ class EyeImagingClassifier:
             model_path = Path(model_path)
 
         self._load_local(model_path)
+        self._base_model_name = None  # set during train()
 
     def _download_model(self):
         """Download model from HuggingFace Hub, using cache."""
@@ -658,12 +701,17 @@ class EyeImagingClassifier:
         return results
 
     @classmethod
-    def train(cls, output_dir=None, device=None):
+    def train(cls, output_dir=None, device=None, base_model_name=None,
+              num_epochs=2, batch_size=16):
         """Train a new classifier from the built-in training data.
 
         Args:
             output_dir: Directory to save the model.
             device: Device for training. None for auto-selection.
+            base_model_name: Sentence transformer backbone model name.
+                Defaults to BASE_MODEL_NAME (sentence-transformers/all-mpnet-base-v2).
+            num_epochs: Number of training epochs (default: 2).
+            batch_size: Training batch size (default: 16).
 
         Returns:
             EyeImagingClassifier instance with the trained model.
@@ -674,8 +722,11 @@ class EyeImagingClassifier:
         if device is None:
             device = cls._select_device()
 
+        if base_model_name is None:
+            base_model_name = BASE_MODEL_NAME
+
         if output_dir is None:
-            output_dir = Path.cwd() / "models" / "setfit_v6"
+            output_dir = Path.cwd() / "models" / "setfit_v7"
         else:
             output_dir = Path(output_dir)
 
@@ -699,12 +750,12 @@ class EyeImagingClassifier:
             }
         )
 
-        print(f"Training SetFit model with {BASE_MODEL_NAME}")
+        print(f"Training SetFit model with {base_model_name}")
         print(f"  Training examples: {len(train_dataset)}")
         print(f"  Device: {device}")
 
         model = SetFitModel.from_pretrained(
-            BASE_MODEL_NAME,
+            base_model_name,
             labels=LABELS,
             device=device,
             trust_remote_code=True,
@@ -712,8 +763,8 @@ class EyeImagingClassifier:
 
         args = TrainingArguments(
             output_dir=str(output_dir / "checkpoints"),
-            batch_size=16,
-            num_epochs=2,
+            batch_size=batch_size,
+            num_epochs=num_epochs,
             evaluation_strategy="no",
             save_strategy="no",
             logging_steps=50,
@@ -732,7 +783,9 @@ class EyeImagingClassifier:
         model.save_pretrained(str(output_dir))
         print(f"Model saved to: {output_dir}")
 
-        return cls(model_path=output_dir, device=device)
+        instance = cls(model_path=output_dir, device=device)
+        instance._base_model_name = base_model_name
+        return instance
 
     @staticmethod
     def extract_text(metadata):
