@@ -1,14 +1,12 @@
 name: Publish to PyPI
 
-# Disabled until PYPI_API_TOKEN is configured
-# Uncomment triggers below when ready for release
 on:
   workflow_dispatch:
-  # release:
-  #   types: [published]
-  # push:
-  #   branches:
-  #     - main
+  release:
+    types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   release:
