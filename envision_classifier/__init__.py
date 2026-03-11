@@ -14,7 +14,7 @@ Usage:
     {'label': 'EYE_IMAGING', 'confidence': 0.999, 'probabilities': {...}}
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "James O'Neill"
 
 from .classifier import EyeImagingClassifier, LABELS
