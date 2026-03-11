@@ -7,7 +7,7 @@ Part of the [EyeACT](https://github.com/EyeACT) project by the [FAIR Data Innova
 ## Installation
 
 ```bash
-pip install git+https://github.com/EyeACT/envision-classifier.git
+pip install envision-classifier
 ```
 
 ## Python API
