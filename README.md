@@ -61,7 +61,7 @@ envision-classifier info
 |-------|-------------|
 | **EYE_IMAGING** | Actual eye imaging datasets (fundus, OCT, OCTA, cornea) |
 | **EYE_SOFTWARE** | Code, tools, models for eye imaging (no actual data) |
-| **EDGE_CASE** | Eye research papers, reviews, non-imaging data |
+| **OTHER_EYE_DATA** | Eye research papers, reviews, non-imaging data |
 | **NEGATIVE** | Not eye-related |
 
 ## Model
