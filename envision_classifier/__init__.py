@@ -4,7 +4,7 @@ envision-classifier: Eye Imaging Dataset Classifier
 A 4-class SetFit classifier for detecting eye imaging datasets:
   - EYE_IMAGING: Actual eye imaging datasets (fundus, OCT, OCTA, etc.)
   - EYE_SOFTWARE: Code, models, tools for eye imaging
-  - EDGE_CASE: Eye research papers, reviews, borderline items
+  - OTHER_EYE_DATA: Eye research papers, reviews, non-imaging data
   - NEGATIVE: Unrelated domains
 
 Usage:
@@ -14,7 +14,7 @@ Usage:
     {'label': 'EYE_IMAGING', 'confidence': 0.999, 'probabilities': {...}}
 """
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __author__ = "James O'Neill"
 
 from .classifier import EyeImagingClassifier, LABELS

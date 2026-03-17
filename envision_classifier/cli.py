@@ -76,7 +76,7 @@ def info():
         LABELS,
         EYE_IMAGING_EXAMPLES,
         EYE_SOFTWARE_EXAMPLES,
-        EDGE_CASE_EXAMPLES,
+        OTHER_EYE_DATA_EXAMPLES,
         NEGATIVE_EXAMPLES,
     )
 
@@ -86,5 +86,5 @@ def info():
     click.echo(f"Labels:           {', '.join(LABELS)}")
     click.echo(f"Training data:    {len(EYE_IMAGING_EXAMPLES)} eye_imaging, "
                f"{len(EYE_SOFTWARE_EXAMPLES)} eye_software, "
-               f"{len(EDGE_CASE_EXAMPLES)} edge_case, "
+               f"{len(OTHER_EYE_DATA_EXAMPLES)} other_eye_data, "
                f"{len(NEGATIVE_EXAMPLES)} negative")

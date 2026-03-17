@@ -67,10 +67,23 @@ envision-classifier info
 ## Model
 
 - **Base model**: `sentence-transformers/all-mpnet-base-v2` (768-dim)
-- **Training data**: 474 curated examples (77 EYE_IMAGING, 48 EYE_SOFTWARE, 79 EDGE_CASE, 270 NEGATIVE)
+- **Training data**: 474 curated examples (77 EYE_IMAGING, 48 EYE_SOFTWARE, 79 OTHER_EYE_DATA, 270 NEGATIVE)
 - **Test accuracy**: 0.937, **macro F1**: 0.902
 - **Spot-check**: 29/33 (87.9%)
 - **Model weights**: [fairdataihub/envision-eye-imaging-classifier](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier)
+
+## Zenodo Classification Results
+
+Applied to 515 Zenodo dataset records via [envision-discovery](https://github.com/EyeACT/envision-discovery):
+
+| Class | Count |
+|-------|-------|
+| EYE_IMAGING | 120 |
+| EYE_SOFTWARE | 66 |
+| OTHER_EYE_DATA | 3 |
+| NEGATIVE | 325 |
+
+Classification is based on metadata only (titles, descriptions, keywords, and file types inspected inside archives via HTTP Range requests) — no dataset files are downloaded.
 
 ## Related
 

@@ -4,7 +4,7 @@ from envision_classifier.classifier import (
     LABELS,
     EYE_IMAGING_EXAMPLES,
     EYE_SOFTWARE_EXAMPLES,
-    EDGE_CASE_EXAMPLES,
+    OTHER_EYE_DATA_EXAMPLES,
     NEGATIVE_EXAMPLES,
 )
 
@@ -18,7 +18,7 @@ def test_labels():
 def test_training_data_not_empty():
     assert len(EYE_IMAGING_EXAMPLES) > 0
     assert len(EYE_SOFTWARE_EXAMPLES) > 0
-    assert len(EDGE_CASE_EXAMPLES) > 0
+    assert len(OTHER_EYE_DATA_EXAMPLES) > 0
     assert len(NEGATIVE_EXAMPLES) > 0
 
 

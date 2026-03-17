@@ -21,7 +21,7 @@ print(result)
 |-------|-------------|
 | `EYE_IMAGING` | Actual eye imaging datasets (fundus, OCT, OCTA, cornea, etc.) |
 | `EYE_SOFTWARE` | Code, tools, models for eye imaging (no actual data) |
-| `EDGE_CASE` | Eye research papers, reviews, borderline items |
+| `OTHER_EYE_DATA` | Eye research papers, reviews, non-imaging data |
 | `NEGATIVE` | Unrelated domains |
 
 ### Batch Classification

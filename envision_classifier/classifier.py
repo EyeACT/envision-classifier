@@ -5,7 +5,7 @@ SetFit Few-Shot Classifier for Eye Imaging Dataset Detection
 Uses sentence-transformers/all-mpnet-base-v2 sentence transformer with 4-class classification:
   - 3: EYE_IMAGING - Actual eye imaging datasets (fundus, OCT, OCTA, cornea, etc.)
   - 2: EYE_SOFTWARE - Code, tools, models for eye imaging (no actual data)
-  - 1: EDGE_CASE - Eye research (papers, reviews, non-imaging data)
+  - 1: OTHER_EYE_DATA - Eye research (papers, reviews, non-imaging data)
   - 0: NEGATIVE - Not eye-related at all
 """
 
@@ -22,7 +22,7 @@ warnings.filterwarnings("ignore")
 # Model configuration
 BASE_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
-LABELS = ["NEGATIVE", "EDGE_CASE", "EYE_SOFTWARE", "EYE_IMAGING"]
+LABELS = ["NEGATIVE", "OTHER_EYE_DATA", "EYE_SOFTWARE", "EYE_IMAGING"]
 
 # ============================================================
 # TRAINING DATA - Curated examples for few-shot learning
@@ -111,7 +111,7 @@ EYE_IMAGING_EXAMPLES = [
 ]
 
 # EYE_SOFTWARE (label=2): Code, tools, models for eye imaging (NOT actual data)
-# Added: misplaced software from EYE_IMAGING + EDGE_CASE, spot-check examples
+# Added: misplaced software from EYE_IMAGING + OTHER_EYE_DATA, spot-check examples
 EYE_SOFTWARE_EXAMPLES = [
     "linchundan88/Fundus-image-preprocessing: fundus image preprocessing Python code",
     "NIH-NEI/oct-image-segmentation-models: v0.8.2 trained model weights",
@@ -150,7 +150,7 @@ EYE_SOFTWARE_EXAMPLES = [
     "ResNet-50 classifiers and diffusion models trained on retinal fundus images",
     "AMikroulis/octopus OCT image processing dataset",
     "anithaj17/RetinoNet-DR-Classification fundus image dataset",
-    # Moved from EDGE_CASE (clearly software/tools)
+    # Moved from OTHER_EYE_DATA (clearly software/tools)
     "Python package for retinal image preprocessing",
     "Deep learning framework for fundus image segmentation code only",
     "OCT image reconstruction algorithm implementation",
@@ -166,9 +166,9 @@ EYE_SOFTWARE_EXAMPLES = [
     "Flexible corneal neurotechnology reveals in-vivo pathological retinal oscillations recording device",
 ]
 
-# EDGE_CASE (label=1): Eye/vision research but NOT actual imaging datasets
+# OTHER_EYE_DATA (label=1): Eye/vision research but NOT actual imaging datasets
 # Cleaned: removed misplaced software→EYE_SOFTWARE, non-eye→NEGATIVE; added eye metabolomics
-EDGE_CASE_EXAMPLES = [
+OTHER_EYE_DATA_EXAMPLES = [
     "A Review of Deep Learning Methods for Diabetic Retinopathy Detection",
     "Survey of Machine Learning Techniques for Glaucoma Diagnosis",
     "Advances in Optical Coherence Tomography Technology Review Article",
@@ -257,7 +257,7 @@ EDGE_CASE_EXAMPLES = [
 ]
 
 # NEGATIVE (label=0): Clearly not eye-related
-# Added: non-eye medical imaging from EDGE_CASE, spot-check confounders
+# Added: non-eye medical imaging from OTHER_EYE_DATA, spot-check confounders
 NEGATIVE_EXAMPLES = [
     "Climate change impact on coral reef ecosystems dataset",
     "COVID-19 genome sequencing and variant analysis",
@@ -492,7 +492,7 @@ NEGATIVE_EXAMPLES = [
     "Dataset_1 of AF driver detection in pulmonary vein area cardiac arrhythmia",
     "Data from Dichoptic metacontrast masking functions to infer transmission delay",
     "IRIS Carbon Mapping Project Curated Dataset carbon emissions",
-    # Moved from EDGE_CASE (non-eye medical imaging — clearly NEGATIVE)
+    # Moved from OTHER_EYE_DATA (non-eye medical imaging — clearly NEGATIVE)
     "Brain MRI analysis for Alzheimer's disease detection",
     "Cardiac CT angiography for coronary artery disease",
     "Dermatology skin lesion classification dataset",
@@ -503,7 +503,7 @@ NEGATIVE_EXAMPLES = [
     "Ultrasound imaging for liver disease assessment",
     "PET scan analysis for neurological disorders",
     "Spine MRI for degenerative disc disease",
-    # Moved from EDGE_CASE (non-eye OCT — clearly NEGATIVE)
+    # Moved from OTHER_EYE_DATA (non-eye OCT — clearly NEGATIVE)
     "OCT for industrial material inspection dataset",
     "Optical coherence tomography in dermatology skin imaging",
     "OCT imaging of atherosclerotic plaque in arteries",
@@ -545,7 +545,7 @@ class EyeImagingClassifier:
     Classifies metadata records into 4 classes:
       - EYE_IMAGING: Actual eye imaging datasets (fundus, OCT, OCTA, etc.)
       - EYE_SOFTWARE: Code, tools, models for eye imaging (no actual data)
-      - EDGE_CASE: Eye research papers, reviews, borderline items
+      - OTHER_EYE_DATA: Eye research papers, reviews, borderline items
       - NEGATIVE: Unrelated domains
 
     Usage:
@@ -679,7 +679,7 @@ class EyeImagingClassifier:
             else:
                 pred_int = {
                     "NEGATIVE": 0,
-                    "EDGE_CASE": 1,
+                    "OTHER_EYE_DATA": 1,
                     "EYE_SOFTWARE": 2,
                     "EYE_IMAGING": 3,
                 }.get(str(pred), 0)
@@ -692,7 +692,7 @@ class EyeImagingClassifier:
                     "confidence": float(max(probs)),
                     "probabilities": {
                         "NEGATIVE": float(probs[0]),
-                        "EDGE_CASE": float(probs[1]),
+                        "OTHER_EYE_DATA": float(probs[1]),
                         "EYE_SOFTWARE": float(probs[2]),
                         "EYE_IMAGING": float(probs[3]),
                     },
@@ -733,13 +733,13 @@ class EyeImagingClassifier:
         train_texts = (
             EYE_IMAGING_EXAMPLES
             + EYE_SOFTWARE_EXAMPLES
-            + EDGE_CASE_EXAMPLES
+            + OTHER_EYE_DATA_EXAMPLES
             + NEGATIVE_EXAMPLES
         )
         train_labels = (
             [3] * len(EYE_IMAGING_EXAMPLES)
             + [2] * len(EYE_SOFTWARE_EXAMPLES)
-            + [1] * len(EDGE_CASE_EXAMPLES)
+            + [1] * len(OTHER_EYE_DATA_EXAMPLES)
             + [0] * len(NEGATIVE_EXAMPLES)
         )
 
