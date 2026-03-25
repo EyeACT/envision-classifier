@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.0] - 2026-03-24
+
+### Breaking
+
+- Switched from 4-class to binary classification (EYE_IMAGING vs NEGATIVE)
+- EYE_SOFTWARE and OTHER_EYE_DATA classes consolidated into NEGATIVE
+
+### Changed
+
+- Training data expanded to 891 examples from multiple repositories (Zenodo, Figshare, Dryad, Kaggle, NEI)
+- Improved precision on Zenodo discovery (60 EYE_IMAGING from 515 records)
+- Held-out test: EYE_IMAGING F1=0.936, Accuracy=0.961
+
 ## [0.1.2] - 2026-03-17
 
 ### Changed

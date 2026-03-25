@@ -21,7 +21,8 @@ clf = EyeImagingClassifier()
 # Classify a single record
 result = clf.classify("Retinal OCT dataset for diabetic retinopathy")
 print(result)
-# {'label': 'EYE_IMAGING', 'confidence': 0.999, 'probabilities': {...}}
+# {'label': 'EYE_IMAGING', 'confidence': 0.98,
+#  'probabilities': {'EYE_IMAGING': 0.98, 'NEGATIVE': 0.02}}
 
 # Classify a batch
 results = clf.classify_batch([
@@ -60,16 +61,14 @@ envision-classifier info
 | Label | Description |
 |-------|-------------|
 | **EYE_IMAGING** | Actual eye imaging datasets (fundus, OCT, OCTA, cornea) |
-| **EYE_SOFTWARE** | Code, tools, models for eye imaging (no actual data) |
-| **OTHER_EYE_DATA** | Eye research papers, reviews, non-imaging data |
-| **NEGATIVE** | Not eye-related |
+| **NEGATIVE** | Everything else (software, non-imaging eye data, unrelated domains) |
 
 ## Model
 
 - **Base model**: `sentence-transformers/all-mpnet-base-v2` (768-dim)
-- **Training data**: 474 curated examples (77 EYE_IMAGING, 48 EYE_SOFTWARE, 79 OTHER_EYE_DATA, 270 NEGATIVE)
-- **Test accuracy**: 0.937, **macro F1**: 0.902
-- **Spot-check**: 29/33 (87.9%)
+- **Training data**: 891 curated examples (262 EYE_IMAGING, 629 NEGATIVE) from Zenodo, Figshare, Dryad, Kaggle, and NEI
+- **Test accuracy**: 0.961, **EYE_IMAGING F1**: 0.936
+- **Spot-check**: 30/33 (90.9%)
 - **Model weights**: [fairdataihub/envision-eye-imaging-classifier](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier)
 
 ## Zenodo Classification Results
@@ -78,12 +77,10 @@ Applied to 515 Zenodo dataset records via [envision-discovery](https://github.co
 
 | Class | Count |
 |-------|-------|
-| EYE_IMAGING | 120 |
-| EYE_SOFTWARE | 66 |
-| OTHER_EYE_DATA | 3 |
-| NEGATIVE | 325 |
+| EYE_IMAGING | 60 |
+| NEGATIVE | 455 |
 
-Classification is based on metadata only (titles, descriptions, keywords, and file types inspected inside archives via HTTP Range requests) — no dataset files are downloaded.
+Classification is based on metadata only (titles, descriptions, keywords, and file types inspected inside archives via HTTP Range requests) -- no dataset files are downloaded.
 
 ## Related
 

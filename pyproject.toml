@@ -1,7 +1,7 @@
 [tool.poetry]
 
 name = "envision-classifier"
-version = "0.1.2"
+version = "0.2.0"
 description = "Few-shot classifier for detecting eye imaging datasets"
 
 packages = [{ include = "envision_classifier" }]
