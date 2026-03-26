@@ -993,10 +993,12 @@ class EyeImagingClassifier:
         """Download model from HuggingFace Hub, using cache."""
         from huggingface_hub import snapshot_download
 
+        print(f"  Downloading model from {HF_MODEL_REPO}...")
         local_dir = snapshot_download(
             repo_id=HF_MODEL_REPO,
             cache_dir=None,  # uses default HF cache
         )
+        print(f"  Model downloaded to {local_dir}")
         return Path(local_dir)
 
     def _load_local(self, model_path):
@@ -1005,9 +1007,12 @@ class EyeImagingClassifier:
         import joblib
 
         model_path = Path(model_path)
+        print(f"  Loading SentenceTransformer from {model_path}...")
         self._encoder = SentenceTransformer(str(model_path), trust_remote_code=True)
         self._encoder = self._encoder.to(self._device)
+        print(f"  Loading classification head...")
         self._head = joblib.load(model_path / "model_head.pkl")
+        print(f"  Model loaded successfully on {self._device}")
 
     @staticmethod
     def _select_device():
@@ -1077,7 +1082,12 @@ class EyeImagingClassifier:
         """Run prediction on a batch of text strings."""
         import numpy as np
 
-        embeddings = self._encoder.encode(texts, convert_to_numpy=True)
+        try:
+            embeddings = self._encoder.encode(texts, convert_to_numpy=True)
+        except Exception as e:
+            print(f"  ERROR encoding batch of {len(texts)} texts: {e}")
+            print(f"  Text lengths: {[len(t) for t in texts]}")
+            raise
         predictions = self._head.predict(embeddings)
         probabilities = self._head.predict_proba(embeddings)
 
