@@ -12,7 +12,7 @@ Usage:
     {'label': 'EYE_IMAGING', 'confidence': 0.999, 'probabilities': {...}}
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 __author__ = "James O'Neill"
 
 from .classifier import EyeImagingClassifier, LABELS
