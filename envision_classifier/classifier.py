@@ -23,6 +23,7 @@ warnings.filterwarnings("ignore")
 BASE_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
 LABELS = ["NEGATIVE", "EYE_IMAGING"]
+MAX_TEXT_LENGTH = 512  # truncate input text to reduce memory during encoding
 
 # Legacy 4-class labels (kept for backward compatibility with old results files)
 LABELS_4CLASS = ["NEGATIVE", "OTHER_EYE_DATA", "EYE_SOFTWARE", "EYE_IMAGING"]
@@ -1010,6 +1011,11 @@ class EyeImagingClassifier:
         print(f"  Loading SentenceTransformer from {model_path}...")
         self._encoder = SentenceTransformer(str(model_path), trust_remote_code=True)
         self._encoder = self._encoder.to(self._device)
+        # Use FP16 to halve model memory (~438MB -> ~220MB)
+        if self._device == "cpu":
+            self._encoder = self._encoder.half().float()
+        else:
+            self._encoder = self._encoder.half()
         print(f"  Loading classification head...")
         self._head = joblib.load(model_path / "model_head.pkl")
         print(f"  Model loaded successfully on {self._device}")
@@ -1078,18 +1084,45 @@ class EyeImagingClassifier:
             all_results.extend(self._predict_batch(batch))
         return all_results
 
+    def _encode_onnx(self, texts):
+        """Encode texts using ONNX Runtime (no PyTorch needed)."""
+        import numpy as np
+        inputs = self._tokenizer(
+            texts, padding=True, truncation=True,
+            max_length=MAX_TEXT_LENGTH, return_tensors="np"
+        )
+        outputs = self._onnx_model(**{k: v for k, v in inputs.items()})
+        attention_mask = inputs["attention_mask"]
+        token_embeddings = outputs.last_hidden_state
+        input_mask_expanded = np.broadcast_to(
+            attention_mask[:, :, np.newaxis], token_embeddings.shape
+        )
+        embeddings = np.sum(token_embeddings * input_mask_expanded, axis=1)
+        embeddings /= np.clip(input_mask_expanded.sum(axis=1), a_min=1e-9, a_max=None)
+        return embeddings
+
     def _predict_batch(self, texts):
         """Run prediction on a batch of text strings."""
+        import gc
         import numpy as np
 
+        # Truncate long texts to reduce tokenization and encoding memory
+        texts = [t[:MAX_TEXT_LENGTH] for t in texts]
+
         try:
-            embeddings = self._encoder.encode(texts, convert_to_numpy=True)
+            if self._encoder is not None:
+                with torch.no_grad():
+                    embeddings = self._encoder.encode(texts, convert_to_numpy=True)
+            else:
+                embeddings = self._encode_onnx(texts)
         except Exception as e:
             print(f"  ERROR encoding batch of {len(texts)} texts: {e}")
             print(f"  Text lengths: {[len(t) for t in texts]}")
             raise
         predictions = self._head.predict(embeddings)
         probabilities = self._head.predict_proba(embeddings)
+
+        gc.collect()
 
         results = []
         for i in range(len(texts)):
@@ -1206,6 +1239,83 @@ class EyeImagingClassifier:
 
         instance = cls(model_path=output_dir, device=device)
         instance._base_model_name = base_model_name
+        return instance
+
+    def export_onnx(self, output_path=None):
+        """Export the encoder to ONNX format for lightweight CPU inference.
+
+        Removes the PyTorch runtime dependency at inference time,
+        saving ~1GB of memory overhead.
+
+        Args:
+            output_path: Directory to save the ONNX model.
+
+        Returns:
+            Path to the exported ONNX model directory.
+        """
+        try:
+            from optimum.onnxruntime import ORTModelForFeatureExtraction
+            from transformers import AutoTokenizer
+        except ImportError:
+            raise ImportError(
+                "ONNX export requires: pip install optimum[onnxruntime]"
+            )
+        import joblib
+
+        if output_path is None:
+            output_path = Path.cwd() / "models" / "onnx"
+        else:
+            output_path = Path(output_path)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        model_name = self._encoder[0].auto_model.config._name_or_path
+        print(f"  Exporting {model_name} to ONNX...")
+
+        ort_model = ORTModelForFeatureExtraction.from_pretrained(
+            model_name, export=True
+        )
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+        ort_model.save_pretrained(output_path)
+        tokenizer.save_pretrained(output_path)
+        joblib.dump(self._head, output_path / "model_head.pkl")
+
+        print(f"  ONNX model exported to {output_path}")
+        return output_path
+
+    @classmethod
+    def from_onnx(cls, model_path, device=None):
+        """Load classifier using ONNX Runtime (lower memory than PyTorch).
+
+        Args:
+            model_path: Path to ONNX model directory (from export_onnx).
+            device: Ignored for ONNX (always CPU). Kept for API compat.
+
+        Returns:
+            EyeImagingClassifier with ONNX backend.
+        """
+        try:
+            from optimum.onnxruntime import ORTModelForFeatureExtraction
+            from transformers import AutoTokenizer
+        except ImportError:
+            raise ImportError(
+                "ONNX inference requires: pip install optimum[onnxruntime]"
+            )
+        import joblib
+
+        model_path = Path(model_path)
+        instance = object.__new__(cls)
+        instance._device = "cpu"
+        instance._base_model_name = None
+
+        print(f"  Loading ONNX model from {model_path}...")
+        instance._onnx_model = ORTModelForFeatureExtraction.from_pretrained(
+            str(model_path)
+        )
+        instance._tokenizer = AutoTokenizer.from_pretrained(str(model_path))
+        instance._head = joblib.load(model_path / "model_head.pkl")
+        instance._encoder = None  # no PyTorch encoder
+        print(f"  ONNX model loaded (no PyTorch runtime needed)")
         return instance
 
     @staticmethod
