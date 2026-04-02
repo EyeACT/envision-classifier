@@ -10,9 +10,8 @@ from envision_classifier.classifier import (
 
 
 def test_labels():
-    assert len(LABELS) == 4
-    assert "EYE_IMAGING" in LABELS
-    assert "NEGATIVE" in LABELS
+    assert len(LABELS) == 2
+    assert LABELS == ["NEGATIVE", "EYE_IMAGING"]
 
 
 def test_training_data_not_empty():
@@ -20,6 +19,16 @@ def test_training_data_not_empty():
     assert len(EYE_SOFTWARE_EXAMPLES) > 0
     assert len(OTHER_EYE_DATA_EXAMPLES) > 0
     assert len(NEGATIVE_EXAMPLES) > 0
+
+
+def test_training_data_is_binary():
+    """All non-EYE_IMAGING examples are treated as NEGATIVE in training."""
+    total_negative = (
+        len(EYE_SOFTWARE_EXAMPLES)
+        + len(OTHER_EYE_DATA_EXAMPLES)
+        + len(NEGATIVE_EXAMPLES)
+    )
+    assert total_negative > len(EYE_IMAGING_EXAMPLES)
 
 
 def test_extract_text():
