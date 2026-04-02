@@ -71,14 +71,18 @@ envision-classifier info
 - **Spot-check**: 30/33 (90.9%)
 - **Model weights**: [fairdataihub/envision-eye-imaging-classifier](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier)
 
-## Zenodo Classification Results
+## Multi-Repository Results
 
-Applied to 515 Zenodo dataset records via [envision-discovery](https://github.com/EyeACT/envision-discovery):
+Applied across 6 repositories via [envision-discovery](https://github.com/EyeACT/envision-discovery):
 
-| Class | Count |
-|-------|-------|
-| EYE_IMAGING | 60 |
-| NEGATIVE | 455 |
+| Source | EYE_IMAGING | NEGATIVE | Total |
+|--------|-------------|----------|-------|
+| Zenodo | 60 | 455 | 515 |
+| DataCite | 752 | 1,084 | 1,836 |
+| Figshare | 1,049 | 951 | 2,000 |
+| Kaggle | 248 | 484 | 732 |
+| Dryad | 32 | 57 | 89 |
+| NEI | 686 | 976 | 1,662 |
 
 Classification is based on metadata only (titles, descriptions, keywords, and file types inspected inside archives via HTTP Range requests) -- no dataset files are downloaded.
 
