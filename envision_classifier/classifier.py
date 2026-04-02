@@ -25,8 +25,6 @@ HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
 LABELS = ["NEGATIVE", "EYE_IMAGING"]
 MAX_TEXT_LENGTH = 512  # truncate input text to reduce memory during encoding
 
-# Legacy 4-class labels (kept for backward compatibility with old results files)
-LABELS_4CLASS = ["NEGATIVE", "OTHER_EYE_DATA", "EYE_SOFTWARE", "EYE_IMAGING"]
 
 # ============================================================
 # TRAINING DATA - Curated examples for few-shot learning
