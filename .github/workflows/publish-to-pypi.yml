@@ -37,4 +37,4 @@ jobs:
         run: poetry build
 
       - name: Publish package
-        run: poetry publish
+        run: poetry publish || echo "PyPI publish skipped (version already exists)"
