@@ -994,12 +994,12 @@ class EyeImagingClassifier:
         """Download model from HuggingFace Hub, using cache."""
         from huggingface_hub import snapshot_download
 
-        print(f"  Downloading model from {HF_MODEL_REPO}...")
+        print(f"  Downloading model from {HF_MODEL_REPO}...", flush=True)
         local_dir = snapshot_download(
             repo_id=HF_MODEL_REPO,
             cache_dir=None,  # uses default HF cache
         )
-        print(f"  Model downloaded to {local_dir}")
+        print(f"  Model downloaded to {local_dir}", flush=True)
         return Path(local_dir)
 
     def _load_local(self, model_path):
@@ -1008,7 +1008,7 @@ class EyeImagingClassifier:
         import joblib
 
         model_path = Path(model_path)
-        print(f"  Loading SentenceTransformer from {model_path}...")
+        print(f"  Loading SentenceTransformer from {model_path}...", flush=True)
         self._encoder = SentenceTransformer(str(model_path), trust_remote_code=True)
         self._encoder = self._encoder.to(self._device)
         # Use FP16 to halve model memory (~438MB -> ~220MB)
@@ -1016,9 +1016,9 @@ class EyeImagingClassifier:
             self._encoder = self._encoder.half().float()
         else:
             self._encoder = self._encoder.half()
-        print(f"  Loading classification head...")
+        print(f"  Loading classification head...", flush=True)
         self._head = joblib.load(model_path / "model_head.pkl")
-        print(f"  Model loaded successfully on {self._device}")
+        print(f"  Model loaded successfully on {self._device}", flush=True)
 
     @staticmethod
     def _select_device():
@@ -1061,12 +1061,13 @@ class EyeImagingClassifier:
             text = self.extract_text(metadata)
         return self._predict_batch([text])[0]
 
-    def classify_batch(self, records, batch_size=16):
+    def classify_batch(self, records, batch_size=16, verbose=True):
         """Classify multiple metadata records.
 
         Args:
             records: list of dicts (with title/description/keywords) or strings.
             batch_size: batch size for inference.
+            verbose: print progress updates during classification.
 
         Returns:
             list of classification result dicts.
@@ -1078,10 +1079,23 @@ class EyeImagingClassifier:
             else:
                 texts.append(self.extract_text(r))
 
+        total = len(texts)
         all_results = []
-        for i in range(0, len(texts), batch_size):
+        for i in range(0, total, batch_size):
             batch = texts[i : i + batch_size]
-            all_results.extend(self._predict_batch(batch))
+            try:
+                all_results.extend(self._predict_batch(batch))
+            except Exception as e:
+                processed = len(all_results)
+                print(f"\n  [classifier] CRASH at record {processed}/{total} "
+                      f"(batch {i}-{i+len(batch)}): {type(e).__name__}: {e}",
+                      flush=True)
+                raise
+            if verbose:
+                processed = len(all_results)
+                if processed % 500 == 0 or processed == total:
+                    print(f"  [classifier] {processed:,}/{total:,} classified",
+                          flush=True)
         return all_results
 
     def _encode_onnx(self, texts):
@@ -1116,8 +1130,8 @@ class EyeImagingClassifier:
             else:
                 embeddings = self._encode_onnx(texts)
         except Exception as e:
-            print(f"  ERROR encoding batch of {len(texts)} texts: {e}")
-            print(f"  Text lengths: {[len(t) for t in texts]}")
+            print(f"  ERROR encoding batch of {len(texts)} texts: {e}", flush=True)
+            print(f"  Text lengths: {[len(t) for t in texts]}", flush=True)
             raise
         predictions = self._head.predict(embeddings)
         probabilities = self._head.predict_proba(embeddings)
