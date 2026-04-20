@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 BASE_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
 HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
 LABELS = ["NEGATIVE", "EYE_IMAGING"]
-MAX_TEXT_LENGTH = 512  # truncate input text to reduce memory during encoding
+MAX_TOKENS = 512  # MPNet context window; tokenizer truncates past this
 
 
 # ============================================================
@@ -1101,7 +1101,7 @@ class EyeImagingClassifier:
         import numpy as np
         inputs = self._tokenizer(
             texts, padding=True, truncation=True,
-            max_length=MAX_TEXT_LENGTH, return_tensors="np"
+            max_length=MAX_TOKENS, return_tensors="np"
         )
         outputs = self._onnx_model(**{k: v for k, v in inputs.items()})
         attention_mask = inputs["attention_mask"]
@@ -1117,9 +1117,6 @@ class EyeImagingClassifier:
         """Run prediction on a batch of text strings."""
         import gc
         import numpy as np
-
-        # Truncate long texts to reduce tokenization and encoding memory
-        texts = [t[:MAX_TEXT_LENGTH] for t in texts]
 
         try:
             if self._encoder is not None:
