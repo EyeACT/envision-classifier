@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore")
 
 # Model configuration
 BASE_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
-HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier"
+HF_MODEL_REPO = "fairdataihub/envision-eye-imaging-classifier-by-metadata"
 LABELS = ["NEGATIVE", "EYE_IMAGING"]
 MAX_TOKENS = 512  # MPNet context window; tokenizer truncates past this
 

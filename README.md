@@ -69,7 +69,7 @@ envision-classifier info
 - **Training data**: 891 curated examples (262 EYE_IMAGING, 629 NEGATIVE) from Zenodo, Figshare, Dryad, Kaggle, and NEI
 - **Test accuracy**: 0.961, **EYE_IMAGING F1**: 0.936
 - **Spot-check**: 30/33 (90.9%)
-- **Model weights**: [fairdataihub/envision-eye-imaging-classifier](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier)
+- **Model weights**: [fairdataihub/envision-eye-imaging-classifier-by-metadata](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier-by-metadata)
 
 ## Multi-Repository Results
 
@@ -89,7 +89,7 @@ Classification is based on metadata only (titles, descriptions, keywords, and fi
 ## Related
 
 - [envision-discovery](https://github.com/EyeACT/envision-discovery) -- Full pipeline (scraping + classification + export)
-- [Model on HuggingFace](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier)
+- [Model on HuggingFace](https://huggingface.co/fairdataihub/envision-eye-imaging-classifier-by-metadata)
 
 ## License
 
